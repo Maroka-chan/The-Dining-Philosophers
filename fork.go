@@ -3,43 +3,35 @@ package main
 import "sync"
 
 type Fork struct {
-	arbiter    sync.Mutex
+	id         int
 	times_used int
 	in_use     int
+	holder     *Philosopher
 	input      chan int
 	output     chan int
-}
-
-func (f *Fork) init() {
-	f.times_used = 0
-	f.in_use = 0
-	f.input, f.output = make(chan int), make(chan int)
+	arbiter    sync.Mutex
 }
 
 func (f *Fork) Run() {
 	for {
 		x := <-f.input
-		f.arbiter.Lock()
 		if x == 1 {
-			f.output <- f.in_use
+			if f.in_use == 1 {
+				f.output <- 0
+			} else {
+				f.in_use = 1
+				f.times_used++
+				f.output <- 1
+			}
 		} else if x == 2 {
+			if f.in_use == 0 {
+				f.output <- 0
+			} else {
+				f.in_use = 0
+				f.output <- 1
+			}
+		} else if x == 10 {
 			f.output <- f.times_used
 		}
-		f.arbiter.Unlock()
 	}
-}
-
-func (f *Fork) PickUp() {
-	f.arbiter.Lock()
-	if f.in_use == 0 {
-		f.times_used++
-		f.in_use = 1
-	}
-	f.arbiter.Unlock()
-}
-
-func (f *Fork) PutDown() {
-	f.arbiter.Lock()
-	f.in_use = 0
-	f.arbiter.Unlock()
 }
