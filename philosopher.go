@@ -36,12 +36,10 @@ func (p *Philosopher) Run() {
 		time.Sleep(time.Second)
 		fmt.Printf("Philosopher %d is HUNGRY\n", p.id)
 		for {
-			//fmt.Printf("P%d Query left fork %d\n", p.id, p.left.id)
 			p.left.input <- 1
 			if <-p.left.output == 0 {
 				continue
 			}
-			//fmt.Printf("P%d Query right fork %d\n", p.id, p.right.id)
 			p.right.input <- 1
 			if <-p.right.output == 0 {
 				continue
