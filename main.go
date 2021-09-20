@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"sync"
 	"time"
 )
 
@@ -12,25 +11,28 @@ func main() {
 	var forks [PNUM]*Fork
 	var philosophers [PNUM]*Philosopher
 
-	for i := 0; i < 5; i++ {
-		forks[i] = &Fork{i, 0, 0, nil, make(chan int), make(chan int), sync.Mutex{}}
+	for i := 0; i < PNUM; i++ {
+		forks[i] = &Fork{i, 0, 0, -1, make(chan int), make(chan int)}
 	}
 
-	for i := 0; i < 5; i++ {
-		philosophers[i] = &Philosopher{i, 0, forks[i], forks[(i+1)%PNUM], make(chan int), make(chan int)}
+	for i := 0; i < PNUM; i++ {
+		left_in, left_out := make(chan int), make(chan int)
+
+		right_in, right_out := make(chan int), make(chan int)
+
+		philosophers[i] = &Philosopher{i, 0, forks[i], forks[(i+1)%PNUM], make(chan int), make(chan int), left_in, left_out, right_in, right_out}
+		go philosophers[i].left.Run(left_in, left_out)
+		go philosophers[i].right.Run(right_in, right_out)
 	}
 
 	for _, fork := range forks {
-		go fork.Run()
+		go fork.Run(fork.input, fork.output)
 	}
 
-	for i := 0; i < 4; i++ {
+	for i := 0; i < PNUM; i++ {
 		go philosophers[i].QueryLoop()
 		go philosophers[i].Run()
 	}
-
-	go philosophers[4].QueryLoop()
-	go philosophers[4].Run_rev()
 
 	// for _, philosopher := range philosophers {
 	// 	go philosopher.QueryLoop()
