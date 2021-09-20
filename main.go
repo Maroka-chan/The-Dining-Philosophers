@@ -16,13 +16,13 @@ func main() {
 	}
 
 	for i := 0; i < PNUM; i++ {
-		left_in, left_out := make(chan int), make(chan int)
+		leftIn, leftOut := make(chan int), make(chan int)
 
-		right_in, right_out := make(chan int), make(chan int)
+		rightIn, rightOut := make(chan int), make(chan int)
 
-		philosophers[i] = &Philosopher{i, 0, forks[i], forks[(i+1)%PNUM], make(chan int), make(chan int), left_in, left_out, right_in, right_out}
-		go philosophers[i].left.Run(left_in, left_out)
-		go philosophers[i].right.Run(right_in, right_out)
+		philosophers[i] = &Philosopher{i, 0, forks[i], forks[(i+1)%PNUM], make(chan int), make(chan int), leftIn, leftOut, rightIn, rightOut}
+		go philosophers[i].left.Run(leftIn, leftOut)
+		go philosophers[i].right.Run(rightIn, rightOut)
 	}
 
 	for _, fork := range forks {

@@ -6,16 +6,16 @@ import (
 )
 
 type Philosopher struct {
-	id          int
-	times_eaten int
-	left        *Fork
-	right       *Fork
-	input       chan int
-	output      chan int
-	left_in     chan int
-	left_out    chan int
-	right_in    chan int
-	right_out   chan int
+	id         int
+	timesEaten int
+	left       *Fork
+	right      *Fork
+	input      chan int
+	output     chan int
+	leftIn     chan int
+	leftOut    chan int
+	rightIn    chan int
+	rightOut   chan int
 }
 
 func (p *Philosopher) Init(id int, left *Fork, right *Fork) {
@@ -23,17 +23,17 @@ func (p *Philosopher) Init(id int, left *Fork, right *Fork) {
 	p.left = left
 	p.right = right
 	p.input, p.output = make(chan int), make(chan int)
-	p.left_in, p.left_out = make(chan int), make(chan int)
-	go p.left.Run(p.left_in, p.left_out)
-	p.right_in, p.right_out = make(chan int), make(chan int)
-	go p.right.Run(p.right_in, p.right_out)
+	p.leftIn, p.leftOut = make(chan int), make(chan int)
+	go p.left.Run(p.leftIn, p.leftOut)
+	p.rightIn, p.rightOut = make(chan int), make(chan int)
+	go p.right.Run(p.rightIn, p.rightOut)
 }
 
 func (p *Philosopher) QueryLoop() {
 	for {
 		x := <-p.input
 		if x == 1 {
-			p.output <- p.times_eaten
+			p.output <- p.timesEaten
 		}
 	}
 }
@@ -46,39 +46,39 @@ func (p *Philosopher) Run() {
 		for {
 			//fmt.Printf("P%d Query left fork %d\n", p.id, p.left.id)
 			fmt.Printf("Philosopher %d tries to pick up Fork %d and %d\n", p.id, p.left.id, p.right.id)
-			p.left_in <- 1
-			p.left_in <- p.id
-			if <-p.left_out == 0 {
+			p.leftIn <- 1
+			p.leftIn <- p.id
+			if <-p.leftOut == 0 {
 				//fmt.Printf("Philosopher %d failed\n", p.id)
 				time.Sleep(time.Second * 5)
 				continue
 			}
 			//fmt.Printf("P%d Query right fork %d\n", p.id, p.right.id)
-			p.right_in <- 1
-			p.right_in <- p.id
-			if <-p.right_out == 0 {
+			p.rightIn <- 1
+			p.rightIn <- p.id
+			if <-p.rightOut == 0 {
 				fmt.Printf("Philosopher %d failed and is putting down fork %d\n", p.id, p.left.id)
-				p.left_in <- 2
-				p.left_in <- p.id
-				fmt.Println(<-p.left_out)
+				p.leftIn <- 2
+				p.leftIn <- p.id
+				fmt.Println(<-p.leftOut)
 				time.Sleep(time.Second * 5)
 				continue
 			}
 
 			fmt.Printf("Philosopher %d succceded\n", p.id)
 			fmt.Printf("Philosopher %d is EATING\n", p.id)
-			p.times_eaten++
+			p.timesEaten++
 			time.Sleep(time.Second * 5)
 
 			fmt.Printf("Philosopher %d puts down Fork %d and %d\n", p.id, p.left.id, p.right.id)
 
-			p.left_in <- 2
-			p.left_in <- p.id
-			fmt.Println(<-p.left_out)
+			p.leftIn <- 2
+			p.leftIn <- p.id
+			fmt.Println(<-p.leftOut)
 
-			p.right_in <- 2
-			p.right_in <- p.id
-			fmt.Println(<-p.right_out)
+			p.rightIn <- 2
+			p.rightIn <- p.id
+			fmt.Println(<-p.rightOut)
 			time.Sleep(time.Second * 1)
 			break
 		}
