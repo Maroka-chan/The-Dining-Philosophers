@@ -1,13 +1,13 @@
 package main
 
 import (
-	"fmt"
 	"time"
 )
 
 type Philosopher struct {
 	id         int
 	timesEaten int
+	eating     int
 	left       *Fork
 	right      *Fork
 	input      chan int
@@ -32,19 +32,19 @@ func (p *Philosopher) Init(id int, left *Fork, right *Fork) {
 func (p *Philosopher) QueryLoop() {
 	for {
 		x := <-p.input
-		if x == 1 {
+		switch x {
+		case 0:
 			p.output <- p.timesEaten
+		case 1:
+			p.output <- p.eating
 		}
 	}
 }
 
 func (p *Philosopher) Run() {
 	for {
-		fmt.Printf("Philosopher %d is THINKING\n", p.id)
 		time.Sleep(time.Second)
-		fmt.Printf("Philosopher %d is HUNGRY\n", p.id)
 		for {
-			fmt.Printf("Philosopher %d tries to pick up Fork %d and %d\n", p.id, p.left.id, p.right.id)
 			p.leftIn <- 1
 			p.leftIn <- p.id
 			if <-p.leftOut == 0 {
@@ -54,28 +54,25 @@ func (p *Philosopher) Run() {
 			p.rightIn <- 1
 			p.rightIn <- p.id
 			if <-p.rightOut == 0 {
-				fmt.Printf("Philosopher %d failed and is putting down fork %d\n", p.id, p.left.id)
 				p.leftIn <- 2
 				p.leftIn <- p.id
-				fmt.Println(<-p.leftOut)
+				<-p.leftOut
 				time.Sleep(time.Second * 5)
 				continue
 			}
 
-			fmt.Printf("Philosopher %d succceded\n", p.id)
-			fmt.Printf("Philosopher %d is EATING\n", p.id)
-			p.timesEaten++
+			p.eating = 1
 			time.Sleep(time.Second * 5)
-
-			fmt.Printf("Philosopher %d puts down Fork %d and %d\n", p.id, p.left.id, p.right.id)
+			p.eating = 0
+			p.timesEaten++
 
 			p.leftIn <- 2
 			p.leftIn <- p.id
-			fmt.Println(<-p.leftOut)
+			<-p.leftOut
 
 			p.rightIn <- 2
 			p.rightIn <- p.id
-			fmt.Println(<-p.rightOut)
+			<-p.rightOut
 			time.Sleep(time.Second * 1)
 			break
 		}

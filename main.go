@@ -39,15 +39,11 @@ func main() {
 
 	for {
 		time.Sleep(time.Second)
-		for i := 0; i < 5; i++ {
+		for i := 0; i < philosopherCount; i++ {
+			philosophers[i].input <- 0
+			fmt.Printf("Philosopher %d:\n  times eaten: %d\n", i, <-philosophers[i].output)
 			philosophers[i].input <- 1
-			fmt.Printf("| P%d: %d ", i, <-philosophers[i].output)
+			fmt.Printf("  eating: %d\n", <-philosophers[i].output)
 		}
-		fmt.Println("|")
-		for i := 0; i < 5; i++ {
-			forks[i].input <- 10
-			fmt.Printf("| F%d: %d ", i, <-forks[i].output)
-		}
-		fmt.Println("|")
 	}
 }
