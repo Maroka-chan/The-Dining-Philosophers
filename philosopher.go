@@ -44,16 +44,13 @@ func (p *Philosopher) Run() {
 		time.Sleep(time.Second)
 		fmt.Printf("Philosopher %d is HUNGRY\n", p.id)
 		for {
-			//fmt.Printf("P%d Query left fork %d\n", p.id, p.left.id)
 			fmt.Printf("Philosopher %d tries to pick up Fork %d and %d\n", p.id, p.left.id, p.right.id)
 			p.leftIn <- 1
 			p.leftIn <- p.id
 			if <-p.leftOut == 0 {
-				//fmt.Printf("Philosopher %d failed\n", p.id)
 				time.Sleep(time.Second * 5)
 				continue
 			}
-			//fmt.Printf("P%d Query right fork %d\n", p.id, p.right.id)
 			p.rightIn <- 1
 			p.rightIn <- p.id
 			if <-p.rightOut == 0 {

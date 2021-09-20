@@ -40,7 +40,6 @@ func (f *Fork) Run(input chan int, output chan int) {
 				output <- 1
 			}
 		} else if x == 10 {
-			//fmt.Printf("Fork %d was queried about times used\n", f.id)
 			output <- f.timesUsed
 		}
 

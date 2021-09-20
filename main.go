@@ -17,7 +17,6 @@ func main() {
 
 	for i := 0; i < PNUM; i++ {
 		leftIn, leftOut := make(chan int), make(chan int)
-
 		rightIn, rightOut := make(chan int), make(chan int)
 
 		philosophers[i] = &Philosopher{i, 0, forks[i], forks[(i+1)%PNUM], make(chan int), make(chan int), leftIn, leftOut, rightIn, rightOut}
@@ -33,11 +32,6 @@ func main() {
 		go philosophers[i].QueryLoop()
 		go philosophers[i].Run()
 	}
-
-	// for _, philosopher := range philosophers {
-	// 	go philosopher.QueryLoop()
-	// 	go philosopher.Run()
-	// }
 
 	for {
 		time.Sleep(time.Second)
