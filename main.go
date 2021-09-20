@@ -33,7 +33,6 @@ func main() {
 	}
 
 	go philosophers[4].QueryLoop()
-	go philosophers[4].Run_rev()
 
 	for {
 		time.Sleep(time.Second)
