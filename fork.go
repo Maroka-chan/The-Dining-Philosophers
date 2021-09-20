@@ -1,7 +1,5 @@
 package main
 
-import "sync"
-
 type Fork struct {
 	id        int
 	timesUsed int
@@ -9,7 +7,6 @@ type Fork struct {
 	holder    *Philosopher
 	input     chan int
 	output    chan int
-	arbiter   sync.Mutex
 }
 
 func (f *Fork) Run() {

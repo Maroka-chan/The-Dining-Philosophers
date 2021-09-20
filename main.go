@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"sync"
 	"time"
 )
 
@@ -16,11 +15,11 @@ func main() {
 	var forks [philosopherCount]*Fork
 	var philosophers [philosopherCount]*Philosopher
 
-	for i := 0; i < 5; i++ {
-		forks[i] = &Fork{i, 0, NotInUse, nil, make(chan int), make(chan int), sync.Mutex{}}
+	for i := 0; i < philosopherCount; i++ {
+		forks[i] = &Fork{i, 0, NotInUse, nil, make(chan int), make(chan int)}
 	}
 
-	for i := 0; i < 5; i++ {
+	for i := 0; i < philosopherCount; i++ {
 		philosophers[i] = &Philosopher{i, 0, forks[i], forks[(i+1)%philosopherCount], make(chan int), make(chan int)}
 	}
 
