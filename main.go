@@ -20,16 +20,11 @@ func main() {
 
 	var philosophers [philosopherCount]*Philosopher
 	for i := 0; i < philosopherCount; i++ {
-		leftIn, leftOut := make(chan int), make(chan int)
-		rightIn, rightOut := make(chan int), make(chan int)
-
-		philosophers[i] = &Philosopher{i, 0, False, forks[i], forks[(i+1)%philosopherCount], make(chan int), make(chan int), leftIn, leftOut, rightIn, rightOut}
-		go philosophers[i].left.Run(leftIn, leftOut)
-		go philosophers[i].right.Run(rightIn, rightOut)
+		philosophers[i] = &Philosopher{i, 0, False, forks[i], forks[(i+1)%philosopherCount], make(chan int), make(chan int)}
 	}
 
 	for _, fork := range forks {
-		go fork.Run(fork.input, fork.output)
+		go fork.Run()
 	}
 
 	for i := 0; i < philosopherCount; i++ {

@@ -20,35 +20,35 @@ type Fork struct {
 	output    chan int
 }
 
-func (f *Fork) Run(input chan int, output chan int) {
+func (f *Fork) Run() {
 	for {
-		x := <-input
+		x := <-f.input
 
 		if x == PickUp {
-			id := <-input
+			id := <-f.input
 			if f.inUse == True {
-				output <- False
+				f.output <- False
 			} else {
 				f.inUse = True
 				f.holderId = id
-				output <- True
+				f.output <- True
 			}
 		} else if x == PutDown {
-			id := <-input
-			forkWasUsed := <-input
+			id := <-f.input
+			forkWasUsed := <-f.input
 			if f.inUse == False || id != f.holderId {
-				output <- False
+				f.output <- False
 			} else {
 				if forkWasUsed == True {
 					f.timesUsed++
 				}
 				f.inUse = False
-				output <- True
+				f.output <- True
 			}
 		} else if x == TimesUsed {
-			output <- f.timesUsed
+			f.output <- f.timesUsed
 		} else if x == InUse {
-			output <- f.inUse
+			f.output <- f.inUse
 		}
 	}
 }

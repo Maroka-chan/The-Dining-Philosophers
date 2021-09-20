@@ -18,10 +18,6 @@ type Philosopher struct {
 	right      *Fork
 	input      chan int
 	output     chan int
-	leftIn     chan int
-	leftOut    chan int
-	rightIn    chan int
-	rightOut   chan int
 }
 
 func (p *Philosopher) QueryLoop() {
@@ -40,19 +36,19 @@ func (p *Philosopher) Run() {
 	for {
 		time.Sleep(time.Second)
 		for {
-			p.leftIn <- PickUp
-			p.leftIn <- p.id
-			if <-p.leftOut == False {
+			p.left.input <- PickUp
+			p.left.input <- p.id
+			if <-p.left.output == False {
 				time.Sleep(time.Second * 5)
 				continue
 			}
-			p.rightIn <- PickUp
-			p.rightIn <- p.id
-			if <-p.rightOut == False {
-				p.leftIn <- PutDown
-				p.leftIn <- p.id
-				p.leftIn <- False
-				<-p.leftOut
+			p.right.input <- PickUp
+			p.right.input <- p.id
+			if <-p.right.output == False {
+				p.left.input <- PutDown
+				p.left.input <- p.id
+				p.left.input <- False
+				<-p.left.output
 				time.Sleep(time.Second * 5)
 				continue
 			}
@@ -62,15 +58,15 @@ func (p *Philosopher) Run() {
 			p.eating = False
 			p.timesEaten++
 
-			p.leftIn <- PutDown
-			p.leftIn <- p.id
-			p.leftIn <- True
-			<-p.leftOut
+			p.left.input <- PutDown
+			p.left.input <- p.id
+			p.left.input <- True
+			<-p.left.output
 
-			p.rightIn <- PutDown
-			p.rightIn <- p.id
-			p.leftIn <- True
-			<-p.rightOut
+			p.right.input <- PutDown
+			p.right.input <- p.id
+			p.right.input <- True
+			<-p.right.output
 			time.Sleep(time.Second * 1)
 			break
 		}
