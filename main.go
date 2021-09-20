@@ -5,21 +5,20 @@ import (
 	"time"
 )
 
-const PNUM int = 5
+const philosopherCount int = 5
 
 func main() {
-	var forks [PNUM]*Fork
-	var philosophers [PNUM]*Philosopher
-
-	for i := 0; i < PNUM; i++ {
+	var forks [philosopherCount]*Fork
+	for i := 0; i < philosopherCount; i++ {
 		forks[i] = &Fork{i, 0, 0, -1, make(chan int), make(chan int)}
 	}
 
-	for i := 0; i < PNUM; i++ {
+	var philosophers [philosopherCount]*Philosopher
+	for i := 0; i < philosopherCount; i++ {
 		leftIn, leftOut := make(chan int), make(chan int)
 		rightIn, rightOut := make(chan int), make(chan int)
 
-		philosophers[i] = &Philosopher{i, 0, forks[i], forks[(i+1)%PNUM], make(chan int), make(chan int), leftIn, leftOut, rightIn, rightOut}
+		philosophers[i] = &Philosopher{i, 0, forks[i], forks[(i+1)%philosopherCount], make(chan int), make(chan int), leftIn, leftOut, rightIn, rightOut}
 		go philosophers[i].left.Run(leftIn, leftOut)
 		go philosophers[i].right.Run(rightIn, rightOut)
 	}
@@ -28,7 +27,7 @@ func main() {
 		go fork.Run(fork.input, fork.output)
 	}
 
-	for i := 0; i < PNUM; i++ {
+	for i := 0; i < philosopherCount; i++ {
 		go philosophers[i].QueryLoop()
 		go philosophers[i].Run()
 	}
