@@ -7,10 +7,15 @@ import (
 
 const philosopherCount int = 5
 
+const (
+	NotEating = 0
+	NotInUse  = 0
+)
+
 func main() {
 	var forks [philosopherCount]*Fork
 	for i := 0; i < philosopherCount; i++ {
-		forks[i] = &Fork{i, 0, 0, -1, make(chan int), make(chan int)}
+		forks[i] = &Fork{i, 0, NotInUse, -1, make(chan int), make(chan int)}
 	}
 
 	var philosophers [philosopherCount]*Philosopher
@@ -18,7 +23,7 @@ func main() {
 		leftIn, leftOut := make(chan int), make(chan int)
 		rightIn, rightOut := make(chan int), make(chan int)
 
-		philosophers[i] = &Philosopher{i, 0, forks[i], forks[(i+1)%philosopherCount], make(chan int), make(chan int), leftIn, leftOut, rightIn, rightOut}
+		philosophers[i] = &Philosopher{i, 0, NotEating, forks[i], forks[(i+1)%philosopherCount], make(chan int), make(chan int), leftIn, leftOut, rightIn, rightOut}
 		go philosophers[i].left.Run(leftIn, leftOut)
 		go philosophers[i].right.Run(rightIn, rightOut)
 	}
