@@ -6,12 +6,12 @@ import (
 )
 
 type Philosopher struct {
-	id          int
-	times_eaten int
-	left        *Fork
-	right       *Fork
-	input       chan int
-	output      chan int
+	id         int
+	timesEaten int
+	left       *Fork
+	right      *Fork
+	input      chan int
+	output     chan int
 }
 
 func (p *Philosopher) Init(id int, left *Fork, right *Fork) {
@@ -25,7 +25,7 @@ func (p *Philosopher) QueryLoop() {
 	for {
 		x := <-p.input
 		if x == 1 {
-			p.output <- p.times_eaten
+			p.output <- p.timesEaten
 		}
 	}
 }
@@ -49,7 +49,7 @@ func (p *Philosopher) Run() {
 
 			fmt.Printf("Philosopher %d picks up Fork %d and %d\n", p.id, p.left.id, p.right.id)
 			fmt.Printf("Philosopher %d is EATING\n", p.id)
-			p.times_eaten++
+			p.timesEaten++
 			time.Sleep(time.Second * 5)
 
 			p.left.input <- 2
@@ -83,7 +83,7 @@ func (p *Philosopher) Run_rev() {
 
 			fmt.Printf("Philosopher %d picks up Fork %d and %d\n", p.id, p.left.id, p.right.id)
 			fmt.Printf("Philosopher %d is EATING\n", p.id)
-			p.times_eaten++
+			p.timesEaten++
 			time.Sleep(time.Second)
 
 			p.right.input <- 2
