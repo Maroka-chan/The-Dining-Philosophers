@@ -4,6 +4,12 @@ import (
 	"time"
 )
 
+// Query enum
+const (
+	TimesEaten = iota
+	IsEating
+)
+
 type Philosopher struct {
 	id         int
 	timesEaten int
@@ -33,9 +39,9 @@ func (p *Philosopher) QueryLoop() {
 	for {
 		x := <-p.input
 		switch x {
-		case 0:
+		case TimesEaten:
 			p.output <- p.timesEaten
-		case 1:
+		case IsEating:
 			p.output <- p.eating
 		}
 	}
@@ -45,33 +51,36 @@ func (p *Philosopher) Run() {
 	for {
 		time.Sleep(time.Second)
 		for {
-			p.leftIn <- 1
+			p.leftIn <- PickUp
 			p.leftIn <- p.id
-			if <-p.leftOut == 0 {
+			if <-p.leftOut == False {
 				time.Sleep(time.Second * 5)
 				continue
 			}
-			p.rightIn <- 1
+			p.rightIn <- PickUp
 			p.rightIn <- p.id
-			if <-p.rightOut == 0 {
-				p.leftIn <- 2
+			if <-p.rightOut == False {
+				p.leftIn <- PutDown
 				p.leftIn <- p.id
+				p.leftIn <- False
 				<-p.leftOut
 				time.Sleep(time.Second * 5)
 				continue
 			}
 
-			p.eating = 1
+			p.eating = True
 			time.Sleep(time.Second * 5)
-			p.eating = 0
+			p.eating = False
 			p.timesEaten++
 
-			p.leftIn <- 2
+			p.leftIn <- PutDown
 			p.leftIn <- p.id
+			p.leftIn <- True
 			<-p.leftOut
 
-			p.rightIn <- 2
+			p.rightIn <- PutDown
 			p.rightIn <- p.id
+			p.leftIn <- True
 			<-p.rightOut
 			time.Sleep(time.Second * 1)
 			break

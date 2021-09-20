@@ -5,17 +5,17 @@ import (
 	"time"
 )
 
-const philosopherCount int = 5
-
 const (
-	NotEating = 0
-	NotInUse  = 0
+	False = iota
+	True
 )
+
+const philosopherCount int = 5
 
 func main() {
 	var forks [philosopherCount]*Fork
 	for i := 0; i < philosopherCount; i++ {
-		forks[i] = &Fork{i, 0, NotInUse, -1, make(chan int), make(chan int)}
+		forks[i] = &Fork{i, 0, False, -1, make(chan int), make(chan int)}
 	}
 
 	var philosophers [philosopherCount]*Philosopher
@@ -23,7 +23,7 @@ func main() {
 		leftIn, leftOut := make(chan int), make(chan int)
 		rightIn, rightOut := make(chan int), make(chan int)
 
-		philosophers[i] = &Philosopher{i, 0, NotEating, forks[i], forks[(i+1)%philosopherCount], make(chan int), make(chan int), leftIn, leftOut, rightIn, rightOut}
+		philosophers[i] = &Philosopher{i, 0, False, forks[i], forks[(i+1)%philosopherCount], make(chan int), make(chan int), leftIn, leftOut, rightIn, rightOut}
 		go philosophers[i].left.Run(leftIn, leftOut)
 		go philosophers[i].right.Run(rightIn, rightOut)
 	}
@@ -40,10 +40,14 @@ func main() {
 	for {
 		time.Sleep(time.Second)
 		for i := 0; i < philosopherCount; i++ {
-			philosophers[i].input <- 0
+			philosophers[i].input <- TimesEaten
 			fmt.Printf("Philosopher %d:\n  times eaten: %d\n", i, <-philosophers[i].output)
-			philosophers[i].input <- 1
+			philosophers[i].input <- IsEating
 			fmt.Printf("  eating: %d\n", <-philosophers[i].output)
+			forks[i].input <- TimesUsed
+			fmt.Printf("Fork %d:\n  times used: %d\n", i, <-forks[i].output)
+			forks[i].input <- InUse
+			fmt.Printf("  in use: %d\n", <-forks[i].output)
 		}
 	}
 }

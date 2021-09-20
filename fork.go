@@ -1,5 +1,16 @@
 package main
 
+// Query enum
+const (
+	InUse = iota
+	TimesUsed
+)
+
+const (
+	PickUp  = iota + 2
+	PutDown = iota + 2
+)
+
 type Fork struct {
 	id        int
 	timesUsed int
@@ -13,27 +24,31 @@ func (f *Fork) Run(input chan int, output chan int) {
 	for {
 		x := <-input
 
-		if x == 1 {
+		if x == PickUp {
 			id := <-input
-			if f.inUse == 1 {
-				output <- 0
+			if f.inUse == True {
+				output <- False
 			} else {
-				f.inUse = 1
+				f.inUse = True
 				f.holderId = id
-				f.timesUsed++
-				output <- 1
+				output <- True
 			}
-		} else if x == 2 {
+		} else if x == PutDown {
 			id := <-input
-			if f.inUse == 0 || id != f.holderId {
-				output <- 0
+			forkWasUsed := <-input
+			if f.inUse == False || id != f.holderId {
+				output <- False
 			} else {
-				f.inUse = 0
-				output <- 1
+				if forkWasUsed == True {
+					f.timesUsed++
+				}
+				f.inUse = False
+				output <- True
 			}
-		} else if x == 10 {
+		} else if x == TimesUsed {
 			output <- f.timesUsed
+		} else if x == InUse {
+			output <- f.inUse
 		}
-
 	}
 }
