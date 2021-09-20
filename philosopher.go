@@ -24,17 +24,6 @@ type Philosopher struct {
 	rightOut   chan int
 }
 
-func (p *Philosopher) Init(id int, left *Fork, right *Fork) {
-	p.id = id
-	p.left = left
-	p.right = right
-	p.input, p.output = make(chan int), make(chan int)
-	p.leftIn, p.leftOut = make(chan int), make(chan int)
-	go p.left.Run(p.leftIn, p.leftOut)
-	p.rightIn, p.rightOut = make(chan int), make(chan int)
-	go p.right.Run(p.rightIn, p.rightOut)
-}
-
 func (p *Philosopher) QueryLoop() {
 	for {
 		x := <-p.input
